@@ -23,11 +23,11 @@ preprocessor definitions that are available:
 | UWP       | `__WINDOWS_UWP__`, `NETFX_CORE` |                                            |
 | watchOS   | `__WATCHOS__`, `__MOBILE__`     | `__UNIFIED__`                              |
 
-More information on `#if` can be found in the C# documentation:
+More information on `#if` can be found in the C# documentation:  
 https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives/preprocessor-if
 
 More information on the platforms and .NET Standard versions can be found in
-the .NET documentation:
+the .NET documentation:  
 https://docs.microsoft.com/en-us/dotnet/standard/net-standard#net-implementation-support
 
 ## The Solution
@@ -101,7 +101,7 @@ fits:
  - for any other project type, the `netstandard` assembly will be selected
 
 More information on creating NuGet packages can be found in the NuGet
-documentation:
+documentation:  
 https://docs.microsoft.com/en-us/nuget/create-packages/creating-a-package
 
 ## Example NuGet Package
