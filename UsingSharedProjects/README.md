@@ -104,7 +104,7 @@ More information on creating NuGet packages can be found in the NuGet
 documentation:  
 https://docs.microsoft.com/en-us/nuget/create-packages/creating-a-package
 
-## Example NuGet Package
+### Example NuGet Package
 
 There are many elements that can be used to customize the package, but only a
 few are required to create a bait-and-switch package:
