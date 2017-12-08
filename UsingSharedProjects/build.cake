@@ -4,6 +4,10 @@ Task("Default")
     .Does(() =>
 {
     // build the library
+    NuGetRestore("./library/Library.sln", new NuGetRestoreSettings
+    {
+        Verbosity = NuGetVerbosity.Quiet
+    });
     MSBuild("./library/Library.sln", new MSBuildSettings
     {
         Verbosity = Verbosity.Minimal,
