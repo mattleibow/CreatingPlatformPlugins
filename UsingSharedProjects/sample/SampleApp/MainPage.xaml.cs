@@ -12,13 +12,11 @@ namespace SampleApp
 			InitializeComponent();
 		}
 
-		protected override async void OnAppearing()
+		protected override void OnAppearing()
 		{
 			base.OnAppearing();
 
 			var properties = Screen.GetProperties();
-
-			await System.Threading.Tasks.Task.Delay(2000);
 
 			label.Text =
 				$"Density: {properties.Density}" + Environment.NewLine +
