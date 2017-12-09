@@ -60,10 +60,10 @@ preprocessor directive:
 
 ```csharp
 // a public class that is visible to any platform
-public class Screen
+public static class Screen
 {
     // a public method that is visible to any platform
-    public double GetDensity()
+    public static double GetDensity()
     {
 #if WINDOWS_UWP
         // code that is specific to UWP
@@ -87,22 +87,16 @@ public class Screen
 }
 ```
 
-## The NuGet Package
+#### Consumer Project
 
-Since most of the work is actually done by NuGet, the definition of the .nuspec
-is very important. NuGet will always choose the more specific platform.
+The consumer app or library can then easily make use of the APIs:
 
-If there is an assembly for `netstandard`, `MonoAndroid` and `MonoAndroid70`,
-depending on the destination project, NuGet will select the assembly that best
-fits:
-
- - for a Android v7.0+ project, the `MonoAndroid70` assembly will be selected
- - for a Android v1.0+ project, the `MonoAndroid` assembly will be selected
- - for any other project type, the `netstandard` assembly will be selected
-
-More information on creating NuGet packages can be found in the NuGet
-documentation:  
-https://docs.microsoft.com/en-us/nuget/create-packages/creating-a-package
+```csharp
+void DoScreenThings()
+{
+    double density = Screen.GetDensity();
+}
+```
 
 ### Example NuGet Package
 

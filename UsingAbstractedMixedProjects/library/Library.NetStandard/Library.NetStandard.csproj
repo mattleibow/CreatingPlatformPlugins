@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <AssemblyName>Library</AssemblyName>
+    <RootNamespace>Library</RootNamespace>
+  </PropertyGroup>
+
+  <Import Project="..\Library\Library.projitems" Label="Shared" />
+
+</Project>

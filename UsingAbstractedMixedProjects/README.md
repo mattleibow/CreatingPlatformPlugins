@@ -1,14 +1,10 @@
-# Using Mixed Projects
+# Using Mixed Projects With Abstraction
 
-Some libraries have some shared code, but have more members that are 
-platform-specific. There may even be complex implmentation details that are
-only relevant to a specific platform.
-
-Instead of large methods and files with numerous preprocessor directives, the
-implementation details can be moved to the platform projects, and just the 
-relevant/shared code in the shared project. Some of the smaller members could 
-still use preprocessor directives, but this could also be moved out into 
-platform projects.
+To reduce the chances of the .NET Standard library recieving features that do
+not get implemented in the platform libraries, the public API can be
+abstracted into interfaces. The shared project defines the interfaces, and
+then platform libraries must implement all the members to avoid any compiler
+errors.
 
 ## The Solution
 
@@ -18,15 +14,6 @@ projects:
  - one **shared project** _(for the code)_
  - one **.NET Standard project** _(for the bait)_
  - several **platform projects** - one per desired platform _(for the switch)_
-
-Since the code is distributed across projects, more effort should be taken to 
-ensure that the assemblies have matching APIs. The .NET Standard assembly 
-should have the same, or a subset, of the APIs exposed in the platform 
-assemblies. This is to avoid a runtime exception if a member is used from a 
-shared project, but then missing from the platform assembly.
-
-The important aspect is that only the public .NET Standard APIs need to exist
-in the platform assemblies - not too important the other way around.
 
 ### Example Solution
 
@@ -42,42 +29,45 @@ An example scenario would be 5 projects:
 
 #### Shared Project
 
-There are several ways to create the shared project (if at all), the first of 
-which is to make sure all platform-specific code exists in the platform 
-libraries - including the code for the .NET Standard library:
+The shared project contains the code that defines the APIs as well as provides
+access to those APIs. It, however, does not contain any implementation details:
 
 ```csharp
-// a public class that is visible to any platform
-public class Screen
+// the public interface that defines the required API
+public interface IScreen
 {
-    // a public method that is visible to any platform
-    public double GetDensity()
-    {
-        // fall back to the platform libraries
-        return ScreenImplementation.GetDensity();
-    }
+    double GetDensity();
+}
+
+// the public class that provides access to the API
+public static class Screen
+{
+#if NETSTANDARD1_0
+    // the public property that throws on any unsupported platforms
+    public static IScreen Instance =>
+        throw new PlatformNotSupportedException();
+#else
+    // a lazy construction of the platform implementation
+    private static Lazy<IScreen> instance = 
+        new Lazy<IScreen>(() => new ScreenImplementation());
+
+    // the public property that provides the API
+    public static IScreen Instance => instance.Value;
+#endif
 }
 ```
 
-Another way might be to make sure the .NET Standard library doesn't have any 
-code other than what comes in from the shared project. This will prevent the 
-.NET Standard library from accidentally receiving APIs that do not exist in 
-the platform libraries:
+In addition to the API definition, the API can be extended using extension
+methods. This allows for any features to be "added" to API, without having to
+change the API definition:
 
 ```csharp
-// a public class that is visible to any platform
-public static class Screen
+// an extension method that "adds" members to the API interface
+public static class ScreenExtensions
 {
-    // a public method that is visible to any platform
-    public static double GetDensity()
+    public static bool IsDense(this IScreen screen)
     {
-#if NETSTANDARD1_0
-        // code that will run on any other platform
-        throw new PlatformNotSupportedException();
-#else
-        // fall back to the platform libraries
-        return ScreenImplementation.GetDensity();
-#endif
+        return screen.GetDensity() > 1.0;
     }
 }
 ```
@@ -85,16 +75,17 @@ public static class Screen
 #### Platform Projects
 
 The platform projects can now just contain implementation details and not be
-too concerned about the API as the result of the shared project being compiled
-in.
+concerned with what needs to be implemented as the compiler does all the work.
+The implementation class just has to implement all the members of the
+interface, and then it will just work:
 
 **Android Project**
 
 ```csharp
 // an internal type that is not visible to the public
-internal static class ScreenImplementation
+internal class ScreenImplementation : IScreen
 {
-    public static double GetDensity()
+    public double GetDensity()
     {
         var svc = Application.Context.GetSystemService(Context.WindowService);
         var wm = svc.JavaCast<IWindowManager>();
@@ -109,9 +100,9 @@ internal static class ScreenImplementation
 
 ```csharp
 // an internal type that is not visible to the public
-internal static class ScreenImplementation
+internal class ScreenImplementation : IScreen
 {
-    public static double GetDensity()
+    public double GetDensity()
     {
         return UIScreen.MainScreen.Scale;
     }
@@ -122,9 +113,9 @@ internal static class ScreenImplementation
 
 ```csharp
 // an internal type that is not visible to the public
-internal static class ScreenImplementation
+internal class ScreenImplementation : IScreen
 {
-    public static double GetDensity()
+    public double GetDensity()
     {
         var di = DisplayInformation.GetForCurrentView();
         return di.RawPixelsPerViewPixel;
@@ -139,7 +130,8 @@ The consumer app or library can then easily make use of the APIs:
 ```csharp
 void DoScreenThings()
 {
-    double density = Screen.GetDensity();
+    IScreen screen = Screen.Instance;
+    double density = screen.GetDensity();
 }
 ```
 
