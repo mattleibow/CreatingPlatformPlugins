@@ -6,10 +6,12 @@ permits the use of platform-specific code from a cross-platform project:
  - [**Shared Project**](UsingSharedProjects)  
    All the code exists in a single shared project, controlled with `#if`
    preprocessor directives. This is good for projects with a large API
-   but a small set of platform-specific code.
+   but only a small set of platform-specific code.
  - [**Mixed Projects**](UsingMixedProjects)  
-   The code exits in both the shared and platform projects
- - [The code exits in both the shared and platform projects](UsingAbstractedMixedProjects)
+   The code exits in both the shared and platform projects. The code still has
+   a few `#if`preprocessor directives, but the main implementation logic has
+   been moved to the platform libraries.
+ - [The code exits in both the shared and platform projects with abstraction](UsingAbstractedMixedProjects)
  - [using a abstraction project](UsingAbstractionProjects)
 
  
