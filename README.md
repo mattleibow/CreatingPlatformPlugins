@@ -8,18 +8,31 @@ permits the use of platform-specific code from a cross-platform project:
    preprocessor directives. This is good for projects with a large API
    but only a small set of platform-specific code.
  - [**Mixed Projects**](UsingMixedProjects)  
-   The code exits in both the shared and platform projects. The code still has
-   a few `#if`preprocessor directives, but the main implementation logic has
-   been moved to the platform libraries.
- - [The code exits in both the shared and platform projects with abstraction](UsingAbstractedMixedProjects)
- - [using a abstraction project](UsingAbstractionProjects)
- - [using multi-targeting](UsingMultiTargeting)
+   The code exists in both the shared and platform projects. The code still has
+   a few `#if` preprocessor directives, but the main implementation logic has
+   been moved to the platform projects. This is good for projects that have a 
+   few platform differences, but those differences require more complex code.
+ - [**Abstracted Project**](UsingAbstractionProjects)  
+   The code is split between a base/core project which defines the public API 
+   using a set of interfaces, and then a series of platform projects which 
+   independently define the implementation of those interfaces. This is good 
+   for projects with larger APIs as well as for libraries that needs to 
+   support third-party extensions or platforms.
+ - [**Mixed Projects with Abstraction**](UsingAbstractedMixedProjects)  
+   The code exists in both the shared and platform projects. Instead of relying
+   of many API matching or numerous `#if` preprocessor directives, the public 
+   API is abstracted out into an interface which can be implemented on each 
+   platform separately.
+ - [**Multi-Targeting**](UsingMultiTargeting)  
+   All the code lives in a single project, which is set up to produce multiple 
+   platform assemblies. The actual implementation may be to use a set of `#if` 
+   preprocessor directives or it may be to abstract interfaces.
 
- 
 ## The NuGet Package
 
 Since most of the work is actually done by NuGet, the definition of the .nuspec
-is very important. NuGet will always choose the more specific platform.
+(or the .csproj for multi-targeting) is very important. NuGet will always 
+choose the more specific platform.
 
 If there is an assembly for `netstandard`, `MonoAndroid` and `MonoAndroid70`,
 depending on the destination project, NuGet will select the assembly that best
