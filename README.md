@@ -13,6 +13,7 @@ permits the use of platform-specific code from a cross-platform project:
    been moved to the platform libraries.
  - [The code exits in both the shared and platform projects with abstraction](UsingAbstractedMixedProjects)
  - [using a abstraction project](UsingAbstractionProjects)
+ - [using multi-targeting](UsingMultiTargeting)
 
  
 ## The NuGet Package
