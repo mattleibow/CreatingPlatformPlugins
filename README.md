@@ -28,6 +28,104 @@ permits the use of platform-specific code from a cross-platform project:
    platform assemblies. The actual implementation may be to use a set of `#if` 
    preprocessor directives or it may be to abstract interfaces.
 
+## Bait-And-Switch
+
+The concept of a bait-and-switch NuGet is very simple and consists of 2 or more
+assemblies with the same name:
+
+ - a dummy assembly, named `AssemblyName.dll`
+ - the real assembly, also named `AssemblyName.dll`
+
+The process of using a bait-and-switch is to compile against the dummy assembly
+and then to run against the real assembly.
+
+### The Problem
+
+The reason this whole process is required is simply because a .NET Standard 
+library or PCL cannot reference a platform-specific project.
+
+An example scenario would be to fetch the current device's screen density. 
+This is a very device-specific process, and there is no way to do this from 
+a .NET Standard library.
+
+A .NET Standard library may be required because the app is a Xamarin.Forms app,
+which is designed to be written in a .NET Standard library. Or the library may
+be targeting multiple platforms, and needs to be consumable from any .NET
+Standard-compliant platform - such as .NET Core or Unity.
+
+### The Solution
+
+Bait-and-switch is a process in which to "trick" the app into thinking that it
+is using a .NET Standard library, but in fact is using a platform library. This
+is typically easy to do as _assemblies are loaded by name_. So, as long as the 
+final assembly names match, the app will never know that the assembly it is 
+running with is not the same as the one it was compiled with.
+
+Obviously, the _public_ types must also match otherwise there will be a runtime
+error when the app attempts to access a member, but it does not exist.
+
+The dummy assembly doesn't have to do anything (it usually just throws an 
+exception), it just needs to have the same name as the platform assembly and 
+have the same _public_ types and mambers.
+
+### An Example Library
+
+Assume that there is some requirement for a .NET Standard library that fetches
+the screen density. Assume this is the required/desired API:
+
+```csharp
+public static class Screen
+{
+    public static double GetDensity();
+}
+```
+
+As can be seen, the API is pure BCL and does not appear to require any platform
+types. Since nothing can be done in the dummy .NET Standard library to fetch 
+the screen density, the only thing to do is to throw an exception:
+
+```csharp
+public static class Screen
+{
+    public static double GetDensity()
+    {
+        throw new PlatformNotSupportedException();
+    }
+}
+```
+
+The exception _should_ never actually be thrown at runtime, because this 
+assembly is never going to make it into the final app. This assembly
+is purely for the compiler during the compilation of the consumer .NET 
+Standard library.
+
+But, the actual implementation is very platform-specific - such as with
+the iOS implementation:
+
+```csharp
+public static class Screen
+{
+    public static double GetDensity()
+    {
+        return UIScreen.MainScreen.Scale;
+    }
+}
+```
+
+The type `UIScreen` is only available on iOS, will only ever be available on 
+iOS and this type will never reach .NET Standard definition. The only way to 
+create this library is to create an iOS library, but this means that it will 
+not be consumable from any .NET Standard library.
+
+Both the dummy .NET Standard library and the platform library _must_ be 
+compiled with the same name. Then, the consumer .NET Standard library 
+references the dummy .NET Standard library and the consumer app references
+the platform library.
+
+If a NuGet is created, then the work will be done automatically and the only 
+step that needs to be taken is to ensure that both the app and the consumer 
+.NET Standard library reference that NuGet.
+
 ## The NuGet Package
 
 Since most of the work is actually done by NuGet, the definition of the .nuspec
