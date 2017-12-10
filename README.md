@@ -42,7 +42,7 @@ and then to run against the real assembly.
 ### The Problem
 
 The reason this whole process is required is simply because a .NET Standard 
-library or PCL cannot reference a platform-specific project.
+library or PCL cannot reference a platform-specific project. 
 
 An example scenario would be to fetch the current device's screen density. 
 This is a very device-specific process, and there is no way to do this from 
@@ -66,7 +66,7 @@ error when the app attempts to access a member, but it does not exist.
 
 The dummy assembly doesn't have to do anything (it usually just throws an 
 exception), it just needs to have the same name as the platform assembly and 
-have the same _public_ types and mambers.
+have the same _public_ types and members.
 
 ### An Example Library
 
