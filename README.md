@@ -28,7 +28,7 @@ permits the use of platform-specific code from a cross-platform project:
    platform assemblies. The actual implementation may be to use a set of `#if` 
    preprocessor directives or it may be to abstract interfaces.
  - [**Generated Projects**](UsingGeneratedProjects)  
-   All the code lives in the platform projects, and then the cross-platform code is genertaed using GenAPI.
+   All the code lives in the platform projects, and then the cross-platform code is genertaed using GenAPI. This is good for projects that have a cross-platform API, but has a large amount of platform-specific code.
 
 ## Bait-And-Switch
 
