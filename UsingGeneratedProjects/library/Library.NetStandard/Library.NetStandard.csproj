@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <AssemblyName>Library</AssemblyName>
+    <RootNamespace>Library</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\output\source\Library.generated.cs" Link="Library.cs" />
+  </ItemGroup>
+
+</Project>
